@@ -99,10 +99,12 @@ def train(net, train_iter, test_iter, batch_size, optimizer, device, num_epochs)
 
 
 def main():
-    lr, num_epochs = 0.001, 150
-    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
-    net = LeNet()
     batch_size = 256
+    lr, num_epochs = 0.001, 150
+
+    net = LeNet()
+    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+    
     # load data
     train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)
     # train
