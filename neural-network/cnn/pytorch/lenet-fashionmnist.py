@@ -99,6 +99,10 @@ def train(net, train_iter, test_iter, batch_size, optimizer, device, num_epochs)
 
 
 def main():
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     batch_size = 256
     lr, num_epochs = 0.001, 150
 
