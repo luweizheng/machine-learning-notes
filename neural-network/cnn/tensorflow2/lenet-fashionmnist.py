@@ -1,4 +1,5 @@
 import os
+# disable DEBUG/INFO/WARNING logs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras
@@ -102,6 +103,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    callback = TrainCallback(net, train_iter, test_iter, num_epochs, device_name)
     history = net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
     return net
 
