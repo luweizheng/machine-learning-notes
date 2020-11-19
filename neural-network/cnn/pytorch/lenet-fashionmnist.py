@@ -12,23 +12,23 @@ class LeNet(nn.Module):
         
         # 输入 1 * 28 * 28
         self.conv = nn.Sequential(
-            # 1 * 28 * 28 -> 6 * 24 * 24
-            nn.Conv2d(1, 6, 5), # in_channels, out_channels, kernel_size
-            nn.Sigmoid(),
-            # 6 * 24 * 24 -> 6 * 12 * 12
-            nn.MaxPool2d(2, 2), # kernel_size, stride
-            # 6 * 12 * 12 -> 16 * 8 * 8 
-            nn.Conv2d(6, 16, 5),
-            nn.Sigmoid(),
-            # 16 * 8 * 8 -> 16 * 4 * 4
-            nn.MaxPool2d(2, 2)
+            # 卷积层1
+            # 1 * (28 + 2 * 2) * (28 + 2 * 2) = 1 * 32 * 32 -> 6 * 28 * 28
+            nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5, padding=2), nn.Sigmoid(),
+            # 6 * 28 * 28 -> 6 * 14 * 14
+            nn.MaxPool2d(kernel_size=2, stride=2), # kernel_size, stride
+            # 卷积层2
+            # 6 * 14 * 14 -> 16 * 10 * 10 
+            nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5), nn.Sigmoid(),
+            # 16 * 10 * 10 -> 16 * 5 * 5
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
         self.fc = nn.Sequential(
-            nn.Linear(16*4*4, 120),
-            nn.Sigmoid(),
-            nn.Linear(120, 84),
-            nn.Sigmoid(),
-            nn.Linear(84, 10)
+            # 全连接层1
+            nn.Linear(in_features=16 * 5 * 5, out_features=120), nn.Sigmoid(),
+            # 全连接层2
+            nn.Linear(in_features=120, out_features=84), nn.Sigmoid(),
+            nn.Linear(in_features=84, out_features=10)
         )
 
     def forward(self, img):
@@ -73,7 +73,12 @@ def evaluate_accuracy(data_iter, net, device=None):
             n += y.shape[0]
     return acc_sum / n
 
-def train(net, train_iter, test_iter, batch_size, optimizer, device, num_epochs):
+def try_gpu(i=0):
+    if torch.cuda.device_count() >= i + 1:
+        return torch.device(f'cuda:{i}')
+    return torch.device('cpu')
+
+def train(net, train_iter, test_iter, batch_size, optimizer, device=try_gpu(), num_epochs):
     net = net.to(device)
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
@@ -97,11 +102,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, device, num_epochs)
             print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, time %.1f sec'
                   % (epoch + 1, train_l_sum / batch_count, train_acc_sum / n, test_acc, time.time() - start))
 
-
 def main():
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     batch_size = 256
     lr, num_epochs = 0.001, 150
