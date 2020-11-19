@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
+import time
 
 def net():
     return tf.keras.models.Sequential([
@@ -37,6 +38,59 @@ def try_gpu(i=0):
         return tf.device(f'/GPU:{i}')
     return tf.device('/CPU:0')
 
+class Timer:
+    """Timer class to record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
+
+class TrainCallback(tf.keras.callbacks.Callback):
+    """A Callback class to log the training progress."""
+    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
+        self.timer = Timer()
+        self.net = net
+        self.train_iter = train_iter
+        self.test_iter = test_iter
+        self.num_epochs = num_epochs
+        self.device_name = device_name
+    def on_epoch_begin(self, epoch, logs=None):
+        self.timer.start()
+    def on_epoch_end(self, epoch, logs):
+        self.timer.stop()
+        test_acc = self.net.evaluate(
+            self.test_iter, verbose=0, return_dict=True)['accuracy']
+        metrics = (logs['loss'], logs['accuracy'], test_acc)
+        if epoch % 10 == 0:
+            batch_size = next(iter(self.train_iter))[0].shape[0]
+            num_examples = batch_size * tf.data.experimental.cardinality(
+                self.train_iter).numpy()
+            print(f'epoch {epoch + 1}: loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+            if epoch == self.num_epochs -1:
+                print(f'Training End: {num_examples / self.timer.avg():.1f} examples/sec on '
+                      f'{str(self.device_name)}')
+
 def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
     """Train a model with a GPU."""
     device_name = device._device_name
@@ -46,8 +100,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    history = net.fit(train_iter, epochs=num_epochs, verbose=2)
-    print(history)
+    history = net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
     return net
 
 def main():
