@@ -47,7 +47,7 @@ def load_data_fashion_mnist(batch_size, resize=None, root='~/Datasets/FashionMNI
     mnist_train = torchvision.datasets.FashionMNIST(root=root, train=True, download=True, transform=transform)
     mnist_test = torchvision.datasets.FashionMNIST(root=root, train=False, download=True, transform=transform)
     if sys.platform.startswith('win'):
-        num_workers = 0  # 0表示不用额外的进程来加速读取数据
+        num_workers = 0  
     else:
         num_workers = 4
     train_iter = torch.utils.data.DataLoader(mnist_train, batch_size=batch_size, shuffle=True, num_workers=num_workers)
@@ -57,17 +57,16 @@ def load_data_fashion_mnist(batch_size, resize=None, root='~/Datasets/FashionMNI
 
 def evaluate_accuracy(data_iter, net, device=None):
     if device is None and isinstance(net, torch.nn.Module):
-        # 如果没指定device就使用net的device
         device = list(net.parameters())[0].device
     acc_sum, n = 0.0, 0
     with torch.no_grad():
         for X, y in data_iter:
             if isinstance(net, torch.nn.Module):
-                # 评估模式, 这会关闭dropout
+                # set the model to evaluation mode (disable dropout)
                 net.eval() 
-                # 计算某一批次的损失
+                # get the acc of this batch
                 acc_sum += (net(X.to(device)).argmax(dim=1) == y.to(device)).float().sum().cpu().item()
-                # 改回训练模式
+                # change back to train mode
                 net.train() 
 
             n += y.shape[0]
