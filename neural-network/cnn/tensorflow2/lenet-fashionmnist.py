@@ -9,10 +9,10 @@ def net():
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
                                padding='same'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+        tf.keras.layers.MaxPool2d(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5,
                                activation='sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+        tf.keras.layers.MaxPool2d(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120, activation='sigmoid'),
         tf.keras.layers.Dense(84, activation='sigmoid'),
@@ -110,7 +110,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.001, 100
+    lr, num_epochs = 0.9, 100
     
     # load data
     train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)
