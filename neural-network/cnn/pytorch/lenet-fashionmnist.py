@@ -3,7 +3,6 @@ import time
 import torch
 import torchvision
 from torch import nn, optim
-
 import sys
 
 class LeNet(nn.Module):
@@ -13,7 +12,8 @@ class LeNet(nn.Module):
         # 输入 1 * 28 * 28
         self.conv = nn.Sequential(
             # 卷积层1
-            # 1 * (28 + 2 * 2) * (28 + 2 * 2) = 1 * 32 * 32 -> 6 * 28 * 28
+            # 在输入基础上增加了padding，28 * 28 -> 32 * 32
+            # 1 * 32 * 32 -> 6 * 28 * 28
             nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5, padding=2), nn.Sigmoid(),
             # 6 * 28 * 28 -> 6 * 14 * 14
             nn.MaxPool2d(kernel_size=2, stride=2), # kernel_size, stride
@@ -37,7 +37,7 @@ class LeNet(nn.Module):
         return output
 
 def load_data_fashion_mnist(batch_size, resize=None, root='~/Datasets/FashionMNIST'):
-    """Use torchvision datasets module to download the fashion mnist dataset and then load into memory."""
+    """Use torchvision.datasets module to download the fashion mnist dataset and then load into memory."""
     trans = []
     if resize:
         trans.append(torchvision.transforms.Resize(size=resize))
@@ -105,7 +105,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.001, 150
+    lr, num_epochs = 0.001, 100
 
     net = LeNet()
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)
@@ -113,7 +113,7 @@ def main():
     # load data
     train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)
     # train
-    train(net, train_iter, test_iter, batch_size, optimizer, device, num_epochs)
+    train(net, train_iter, test_iter, batch_size, optimizer, num_epochs)
 
 if __name__ == '__main__':
     main()
