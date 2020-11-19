@@ -98,16 +98,15 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
             batch_count += 1
         test_acc = evaluate_accuracy(test_iter, net)
         if epoch % 10 == 0:
-            print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, time %.1f sec'
-                  % (epoch + 1, train_l_sum / batch_count, train_acc_sum / n, test_acc, time.time() - start))
+            print(f'epoch {epoch + 1} : loss {train_l_sum / batch_count:.3f}, train acc {train_acc_sum / n:.3f}, test acc {test_acc:.3f}')
 
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.001, 100
+    lr, num_epochs = 0.9, 100
 
     net = LeNet()
-    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     
     # load data
     train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)

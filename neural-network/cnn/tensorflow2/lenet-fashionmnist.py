@@ -54,9 +54,6 @@ def main():
 
     batch_size = 256
     lr, num_epochs = 0.001, 100
-
-    net = LeNet()
-    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
     
     # load data
     train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)
