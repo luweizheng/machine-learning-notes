@@ -7,14 +7,22 @@ import time
 
 def net():
     return tf.keras.models.Sequential([
+        # 卷积层1
+        # padding='same'：在输入矩阵上增加padding，使得输出矩阵的大小与输入矩阵相同，输入28 * 28，输出28 * 28
         tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
                                padding='same'),
-        tf.keras.layers.MaxPool2d(pool_size=2, strides=2),
+        # 6 * 28 * 28 -> 6 * 14 * 14
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        # 卷积层2
+        # 6 * 14 * 14 -> 16 * 10 * 10
         tf.keras.layers.Conv2D(filters=16, kernel_size=5,
                                activation='sigmoid'),
-        tf.keras.layers.MaxPool2d(pool_size=2, strides=2),
+        # 16 * 10 * 10 -> 16 * 5 * 5
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
+        # 全连接层1
         tf.keras.layers.Dense(120, activation='sigmoid'),
+        # 全连接层2
         tf.keras.layers.Dense(84, activation='sigmoid'),
         tf.keras.layers.Dense(10)])
 
@@ -24,7 +32,8 @@ def load_data_fashion_mnist(batch_size, resize=None):
     mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
     
     # Divide all numbers by 255 so that all pixel values are between
-    # 0 and 1, add a batch dimension at the last. And cast label to int32
+    # 0 and 1, add a batch dimension at the last. 
+    # cast label to int32
     process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
                             tf.cast(y, dtype='int32'))
     resize_fn = lambda X, y: (
