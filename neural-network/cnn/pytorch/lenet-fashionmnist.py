@@ -83,7 +83,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
     loss = torch.nn.CrossEntropyLoss()
     batch_count = 0
     for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
+        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
             X = X.to(device)
             y = y.to(device)

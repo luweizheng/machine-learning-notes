@@ -94,13 +94,13 @@ class TrainCallback(tf.keras.callbacks.Callback):
             self.test_iter, verbose=0, return_dict=True)['accuracy']
         metrics = (logs['loss'], logs['accuracy'], test_acc)
         if epoch % 10 == 0:
+            print(f'epoch {epoch + 1}: loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+        if epoch == self.num_epochs -1:
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(
                 self.train_iter).numpy()
-            print(f'epoch {epoch + 1}: loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
-                  f'test acc {metrics[2]:.3f}')
-            if epoch == self.num_epochs -1:
-                print(f'Training End: {num_examples / self.timer.avg():.1f} examples/sec on '
+            print(f'Training End: {num_examples / self.timer.avg():.1f} examples/sec on '
                       f'{str(self.device_name)}')
 
 def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
