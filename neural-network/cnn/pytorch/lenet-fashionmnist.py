@@ -78,7 +78,7 @@ def try_gpu(i=0):
         return torch.device(f'cuda:{i}')
     return torch.device('cpu')
 
-def train(net, train_iter, test_iter, batch_size, optimizer, device=try_gpu(), num_epochs):
+def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=try_gpu()):
     net = net.to(device)
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
