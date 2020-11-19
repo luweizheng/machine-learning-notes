@@ -46,7 +46,8 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    history = net.fit(train_iter, epochs=num_epochs)
+    history = net.fit(train_iter, epochs=num_epochs, verbose=2)
+    print(history)
     return net
 
 def main():
