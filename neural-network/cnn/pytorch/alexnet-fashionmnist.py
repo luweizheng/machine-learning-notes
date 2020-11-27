@@ -4,7 +4,9 @@ import torch
 import torchvision
 from torch import nn, optim
 import sys
-import mlutils
+import sys
+sys.path.append("..") 
+import mlutils.pytorch as mlutils
 
 class AlexNet(nn.Module):
     def __init__(self):
@@ -44,36 +46,17 @@ class AlexNet(nn.Module):
         output = self.fc(feature.view(img.shape[0], -1))
         return output
 
-def evaluate_accuracy(data_iter, net, device=None):
-    if device is None and isinstance(net, torch.nn.Module):
-        device = list(net.parameters())[0].device
-    acc_sum, n = 0.0, 0
-    with torch.no_grad():
-        for X, y in data_iter:
-            if isinstance(net, torch.nn.Module):
-                # set the model to evaluation mode (disable dropout)
-                net.eval()
-                # get the acc of this batch
-                acc_sum += (net(X.to(device)).argmax(dim=1) == y.to(device)).float().sum().cpu().item()
-                # change back to train mode
-                net.train()
-
-            n += y.shape[0]
-    return acc_sum / n
-
-def try_gpu(i=0):
-    if torch.cuda.device_count() >= i + 1:
-        return torch.device(f'cuda:{i}')
-    return torch.device('cpu')
-
 def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=try_gpu()):
     net = net.to(device)
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
-    batch_count = 0
+    timer = mlutils.Timer()
     for epoch in range(num_epochs):
+        # Accumulator has 3 parameters: (loss, train_acc, batch_size)
+        metric = mlutils.Accumulator(3)
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
+            timer.start()
             X = X.to(device)
             y = y.to(device)
             y_hat = net(X)
@@ -81,21 +64,26 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
             optimizer.zero_grad()
             l.backward()
             optimizer.step()
-            train_l_sum += l.cpu().item()
-            train_acc_sum += (y_hat.argmax(dim=1) == y).sum().cpu().item()
-            n += y.shape[0]
-            batch_count += 1
-        test_acc = evaluate_accuracy(test_iter, net)
-        if epoch % 10 == 0:
-            print(f'epoch {epoch + 1} : loss {train_l_sum / batch_count:.3f}, train acc {train_acc_sum / n:.3f}, test acc {test_acc:.3f}')
+            with torch.no_grad():
+                metric.add(l * X.shape[0], mlutils.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
+            # metric[0] = l * X.shape[0], metric[2] = X.shape[0]
+            train_l = metric[0]/metric[2]
+            # metric[1] = number of correct predictions, metric[2] = X.shape[0]
+            train_acc = metric[1]/metric[2]
+        test_acc = mlutils.evaluate_accuracy_gpu(net, test_iter)
+        if epoch % 1 == 0:
+            print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
+    # after training, calculate examples/sec
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec ' f'on {str(device)}')
 
 def main():
 
     batch_size = 128
-    lr, num_epochs = 0.01, 100
+    lr, num_epochs = 0.001, 100
 
     net = AlexNet()
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
 
     # load data
     train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size, resize=224)

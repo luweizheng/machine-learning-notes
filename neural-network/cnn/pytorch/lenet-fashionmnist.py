@@ -58,23 +58,6 @@ def load_data_fashion_mnist(batch_size, resize=None, root='~/Datasets/FashionMNI
 
     return train_iter, test_iter
 
-def evaluate_accuracy(data_iter, net, device=None):
-    if device is None and isinstance(net, torch.nn.Module):
-        device = list(net.parameters())[0].device
-    acc_sum, n = 0.0, 0
-    with torch.no_grad():
-        for X, y in data_iter:
-            if isinstance(net, torch.nn.Module):
-                # set the model to evaluation mode (disable dropout)
-                net.eval() 
-                # get the acc of this batch
-                acc_sum += (net(X.to(device)).argmax(dim=1) == y.to(device)).float().sum().cpu().item()
-                # change back to train mode
-                net.train() 
-
-            n += y.shape[0]
-    return acc_sum / n
-
 # save to mlutils so that other program can use it
 def try_gpu(i=0):
     if torch.cuda.device_count() >= i + 1:
@@ -85,8 +68,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
     net = net.to(device)
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
-    batch_count = 0
-    timer, num_batches = mlutils.Timer(), len(train_iter)
+    timer = mlutils.Timer()
     for epoch in range(num_epochs):
         # Accumulator has 3 parameters: (loss, train_acc, batch_size)
         metric = mlutils.Accumulator(3)
