@@ -4,6 +4,8 @@ import torch
 import torchvision
 from torch import nn, optim
 import sys
+sys.path.append("..") 
+import mlutils.pytorch as 
 
 class LeNet(nn.Module):
     def __init__(self):
@@ -109,7 +111,7 @@ def main():
     optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     
     # load data
-    train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)
+    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size)
     # train
     train(net, train_iter, test_iter, batch_size, optimizer, num_epochs)
 
