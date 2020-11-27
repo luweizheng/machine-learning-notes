@@ -110,15 +110,16 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
         test_acc = mlutils.evaluate_accuracy_gpu(net, test_iter)
         if epoch % 1 == 0:
             print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
-            print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec ' f'on {str(device)}')
+    # after training, calculate examples/sec
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec ' f'on {str(device)}')
 
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.01, 100
+    lr, num_epochs = 0.001, 100
 
     net = LeNet()
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
     
     # load data
     train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size)
