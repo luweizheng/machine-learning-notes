@@ -107,17 +107,15 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
             train_l = metric[0]/metric[2]
             # metric[1] = number of correct predictions, metric[2] = X.shape[0]
             train_acc = metric[1]/metric[2]
-            n += y.shape[0]
-            batch_count += 1
         test_acc = mlutils.evaluate_accuracy_gpu(net, test_iter)
         if epoch % 1 == 0:
-            print(f'epoch {epoch + 1} : loss {train_l_sum / batch_count:.3f}, train acc {train_acc_sum / n:.3f}, test acc {test_acc:.3f}')
+            print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
             print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec ' f'on {str(device)}')
 
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.9, 100
+    lr, num_epochs = 0.01, 100
 
     net = LeNet()
     optimizer = torch.optim.SGD(net.parameters(), lr=lr)
