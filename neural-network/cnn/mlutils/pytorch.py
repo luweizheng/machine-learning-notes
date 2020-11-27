@@ -2,6 +2,7 @@ import torch
 import torchvision
 from torch import nn
 import sys
+import time
 
 def load_data_fashion_mnist(batch_size, resize=None, root='~/Datasets/FashionMNIST'):
     """Use torchvision.datasets module to download the fashion mnist dataset and then load into memory."""
