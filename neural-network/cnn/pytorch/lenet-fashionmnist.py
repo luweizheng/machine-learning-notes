@@ -69,12 +69,14 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
     timer = mlutils.Timer()
+    Xshape = 0
     for epoch in range(num_epochs):
         # Accumulator has 3 parameters: (loss, train_acc, batch_size)
         metric = mlutils.Accumulator(3)
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
             timer.start()
+            Xshape = X.shape
             X = X.to(device)
             y = y.to(device)
             y_hat = net(X)
@@ -93,12 +95,12 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
         if epoch % 1 == 0:
             print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
     # after training, calculate examples/sec
-    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec ' f'on {str(device)}')
+    print(f'total training time {timer.sum()}:.2f, {Xshape * num_epochs / timer.sum():.1f} examples/sec ' f'on {str(device)}')
 
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.001, 100
+    lr, num_epochs = 0.001, 10
 
     net = LeNet()
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)
