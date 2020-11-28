@@ -38,7 +38,8 @@ def accuracy(y_hat, y):
 
 def evaluate_accuracy_gpu(net, data_iter, device=None):
     """Compute the accuracy for a model on a dataset using a GPU."""
-    net.eval()  # Set the model to evaluation mode
+    # Set the model to evaluation mode
+    net.eval()  
     if not device:
         device = next(iter(net.parameters())).device
     # Accumulator has 2 parameters: (number of correct predictions, number of predictions)

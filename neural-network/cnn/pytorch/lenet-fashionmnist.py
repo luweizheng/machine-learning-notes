@@ -74,6 +74,9 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
         metric = mlutils.Accumulator(3)
         for X, y in train_iter:
             timer.start()
+            # set the network in training mode
+            net.train()
+            # move data to device (gpu)
             X = X.to(device)
             y = y.to(device)
             y_hat = net(X)
@@ -82,6 +85,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
             l.backward()
             optimizer.step()
             with torch.no_grad():
+                # all the following metrics will be accumulated into variable `metric`
                 metric.add(l * X.shape[0], mlutils.accuracy(y_hat, y), X.shape[0])
             timer.stop()
             # metric[0] = l * X.shape[0], metric[2] = X.shape[0]
@@ -91,9 +95,8 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
         test_acc = mlutils.evaluate_accuracy_gpu(net, test_iter)
         if epoch % 1 == 0:
             print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
-    # after training, calculate examples/sec
-    print(metric[2])
-    print(f'total training time {timer.sum():.2f}, {60000 * num_epochs / timer.sum():.1f} images/sec ' f'on {str(device)}')
+    # after training, calculate images/sec
+    print(f'total training time {timer.sum():.2f}, {metric[2] * num_epochs / timer.sum():.1f} images/sec ' f'on {str(device)}')
 
 def main():
 
