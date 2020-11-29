@@ -69,9 +69,11 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
     timer = mlutils.Timer()
+    # in one epoch, it will iterate all training samples
     for epoch in range(num_epochs):
-        # Accumulator has 3 parameters: (loss, train_acc, batch_size)
+        # Accumulator has 3 parameters: (loss, train_acc, number_of_images_processed)
         metric = mlutils.Accumulator(3)
+        # all training samples will be splited into batch_size
         for X, y in train_iter:
             timer.start()
             # set the network in training mode
@@ -96,6 +98,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
         if epoch % 1 == 0:
             print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
     # after training, calculate images/sec
+    # variable `metric` is defined in for loop, but in Python it can be referenced after for loop
     print(f'total training time {timer.sum():.2f}, {metric[2] * num_epochs / timer.sum():.1f} images/sec ' f'on {str(device)}')
 
 def main():
