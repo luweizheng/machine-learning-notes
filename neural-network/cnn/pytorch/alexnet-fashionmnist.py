@@ -60,7 +60,7 @@ class AlexNet(nn.Module):
         output = self.fc(feature.view(img.shape[0], -1))
         return output
 
-def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=try_gpu()):
+def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=mlutils.try_gpu()):
     net = net.to(device)
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
@@ -100,7 +100,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
 def main():
 
     batch_size = 128
-    lr, num_epochs = 0.001, 100
+    lr, num_epochs = 0.001, 10
 
     net = AlexNet()
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)
