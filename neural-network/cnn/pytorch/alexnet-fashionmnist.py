@@ -97,7 +97,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
     # variable `metric` is defined in for loop, but in Python it can be referenced after for loop
     print(f'total training time {timer.sum():.2f}, {metric[2] * num_epochs / timer.sum():.1f} images/sec ' f'on {str(device)}')
 
-def main():
+def main(args):
 
     batch_size = 128
     lr, num_epochs = 0.001, 10
