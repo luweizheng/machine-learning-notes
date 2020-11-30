@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import time
 
 def load_data_fashion_mnist(batch_size, resize=None):
     """Use keras datasets module to download the Fashion-MNIST dataset and then load it into memory."""
@@ -88,4 +89,4 @@ class TrainCallback(tf.keras.callbacks.Callback):
         if epoch == self.num_epochs - 1:
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(self.train_iter).numpy()
-            print(f'total training time {timer.sum():.2f}, {num_examples / self.timer.avg():.1f} images/sec on {str(self.device_name)}')
+            print(f'total training time {self.timer.sum():.2f}, {num_examples / self.timer.avg():.1f} images/sec on {str(self.device_name)}')

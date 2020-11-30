@@ -1,5 +1,8 @@
 import torch
 from torch import nn
+import sys
+sys.path.append("..") 
+import mlutils.pytorch as mlutils
 
 def vgg_block(num_convs, in_channels, out_channels):
     '''

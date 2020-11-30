@@ -4,6 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras
 import time
+import sys
 sys.path.append("..") 
 import mlutils.tensorflow as mlutils
 
@@ -108,9 +109,10 @@ class TrainCallback(tf.keras.callbacks.Callback):
             print(f'Training End: {num_examples / self.timer.avg():.1f} examples/sec on '
                       f'{str(self.device_name)}')
 
-def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
+def train(net_fn, train_iter, test_iter, num_epochs, lr, device=mlutils.try_gpu()):
     """Train a model with a GPU."""
     device_name = device._device_name
+    print("training on", device_name)
     strategy = tf.distribute.OneDeviceStrategy(device_name)
     with strategy.scope():
         optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
