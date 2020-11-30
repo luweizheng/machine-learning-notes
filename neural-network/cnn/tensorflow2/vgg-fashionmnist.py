@@ -7,38 +7,28 @@ import sys
 sys.path.append("..") 
 import mlutils.tensorflow as mlutils
 
-def net():
-    # conv: floor((input_shape - kernel_size + padding + stride) / stride)
-    # input shape: 1 * 224 * 224
-    return tf.keras.models.Sequential([
-        # conv: 1 * 224 * 224 -> 96 * 54 * 54 
-        tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4, activation='relu'),
-        # 96 * 54 * 54 -> 96 * 26 * 26
-        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        # conv layer 2: decrease kernel size, add padding to keep input and output size same, increase channel number
-        # 96 * 26 * 26 -> 256 * 26 * 26
-        tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same', activation='relu'),
-        # 256 * 26 * 26 -> 256 * 12 * 12
-        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        # 3 consecutive conv layer, smaller kernel size
-        # 256 * 12 * 12 -> 384 * 12 * 12
-        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same', activation='relu'),
-        # 384 * 12 * 12 -> 384 * 12 * 12
-        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same', activation='relu'),
-        # 384 * 12 * 12 -> 256 * 12 * 12
-        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', activation='relu'),
-        # 256 * 5 * 5
-        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+def vgg_block(num_convs, num_channels):
+    blk = tf.keras.models.Sequential()
+    for _ in range(num_convs):
+        blk.add(tf.keras.layers.Conv2D(num_channels,kernel_size=3,
+                                    padding='same',activation='relu'))
+    blk.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+    return blk
+
+def vgg(conv_arch):
+    net = tf.keras.models.Sequential()
+    # The convulational part
+    for (num_convs, num_channels) in conv_arch:
+        net.add(vgg_block(num_convs, num_channels))
+    # The fully-connected part
+    net.add(tf.keras.models.Sequential([
         tf.keras.layers.Flatten(),
-        # Use the dropout layer to mitigate overfitting
         tf.keras.layers.Dense(4096, activation='relu'),
         tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(4096, activation='relu'),
         tf.keras.layers.Dropout(0.5),
-        # Output layer. 
-        # the number of classes in Fashion-MNIST is 10
-        tf.keras.layers.Dense(10)
-    ])
+        tf.keras.layers.Dense(10)]))
+    return net
 
 def train(net_fn, train_iter, test_iter, num_epochs, lr, device=mlutils.try_gpu()):
     """Train a model with a GPU."""
@@ -55,10 +45,18 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=mlutils.try_gpu(
     return net
 
 def main(args):
+    # The original VGG network has 5 convolutional blocks.
+    # The first two blocks have one convolutional layer.
+    # The latter three blocks contain two convolutional layers.
+    conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
+
+    # The parameters of VGG-11 are big, use a ratio to reduce the network size by dividing a ratio on the output channel number.
+    ratio = args.ratio
+    small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
+    net = lambda: vgg(small_conv_arch)
 
     # load data
     train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=224)
-
     # train
     train(net, train_iter, test_iter, args.num_epochs, args.lr)
 
@@ -67,5 +65,6 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=128, help='batch size')
     parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
+    parser.add_argument('--ratio', type=float, default=4, help='ratio to reduce the network parameters size')
     args = parser.parse_args()
     main(args)
