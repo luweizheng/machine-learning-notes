@@ -4,6 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras
 import time
+import argparse
 import sys
 sys.path.append("..") 
 import mlutils.tensorflow as mlutils
@@ -123,9 +124,9 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=mlutils.try_gpu(
     history = net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
     return net
 
-def main():
+def main(args):
 
-    batch_size = 256
+    batch_size = args.batch_size
     lr, num_epochs = 0.001, 10
     
     # load data
@@ -135,4 +136,7 @@ def main():
     train(net, train_iter, test_iter, num_epochs, lr)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Image classification')
+    parser.add_argument('--batch_size', type=int, default=128, help='batch_size')
+    args = parser.parse_args()
+    main(args)
