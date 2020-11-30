@@ -3,6 +3,7 @@ import time
 import torch
 import torchvision
 from torch import nn, optim
+import argparse
 import sys
 sys.path.append("..") 
 import mlutils.pytorch as mlutils
@@ -102,12 +103,17 @@ def main():
     lr, num_epochs = 0.001, 10
 
     net = AlexNet()
-    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
 
     # load data
-    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size, resize=224)
+    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=224)
     # train
-    train(net, train_iter, test_iter, batch_size, optimizer, num_epochs)
+    train(net, train_iter, test_iter, batch_size, optimizer, args.num_epochs)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Image classification')
+    parser.add_argument('--batch_size', type=int, default=128, help='batch_size')
+    parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
+    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
+    args = parser.parse_args()
+    main(args)

@@ -125,18 +125,17 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=mlutils.try_gpu(
     return net
 
 def main(args):
-
-    batch_size = args.batch_size
-    lr, num_epochs = 0.001, 10
     
     # load data
-    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size)
+    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size)
 
     # train
-    train(net, train_iter, test_iter, num_epochs, lr)
+    train(net, train_iter, test_iter, args.num_epochs, args.lr)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image classification')
     parser.add_argument('--batch_size', type=int, default=128, help='batch_size')
+    parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
+    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     args = parser.parse_args()
     main(args)
