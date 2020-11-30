@@ -99,9 +99,6 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
 
 def main(args):
 
-    batch_size = 128
-    lr, num_epochs = 0.001, 10
-
     net = AlexNet()
     optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
 
