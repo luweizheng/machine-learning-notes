@@ -106,7 +106,7 @@ def main(args):
     # load data
     train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=224)
     # train
-    train(net, train_iter, test_iter, batch_size, optimizer, args.num_epochs)
+    train(net, train_iter, test_iter, args.batch_size, optimizer, args.num_epochs)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image classification')
