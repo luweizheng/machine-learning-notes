@@ -31,7 +31,7 @@ class AlexNet(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=2),
             # 3 consecutive conv layer, smaller kernel size
             # floor((12 - 3 + 2 + 1) / 1) = 12
-            # 256 * 26 * 26 -> 384 * 12 * 12
+            # 256 * 12 * 12 -> 384 * 12 * 12
             nn.Conv2d(in_channels=256, out_channels=384, kernel_size=3, stride=1, padding=1), nn.ReLU(),
             # 384 * 12 * 12 -> 384 * 12 * 12
             nn.Conv2d(in_channels=384, out_channels=384, kernel_size=3, stride=1, padding=1), nn.ReLU(),

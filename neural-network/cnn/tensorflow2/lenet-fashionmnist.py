@@ -40,10 +40,8 @@ def load_data_fashion_mnist(batch_size, resize=None):
     # Divide all numbers by 255 so that all pixel values are between
     # 0 and 1, add a batch dimension at the last. 
     # cast label to int32
-    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
-                            tf.cast(y, dtype='int32'))
-    resize_fn = lambda X, y: (
-        tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
+    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255, tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
     return (
         tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
             batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
@@ -135,7 +133,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image classification')
-    parser.add_argument('--batch_size', type=int, default=128, help='batch_size')
+    parser.add_argument('--batch_size', type=int, default=128, help='batch size')
     parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     args = parser.parse_args()
