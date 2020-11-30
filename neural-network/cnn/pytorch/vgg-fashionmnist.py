@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import argparse
 import sys
 sys.path.append("..") 
 import mlutils.pytorch as mlutils
@@ -89,27 +90,29 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
     # variable `metric` is defined in for loop, but in Python it can be referenced after for loop
     print(f'total training time {timer.sum():.2f}, {metric[2] * num_epochs / timer.sum():.1f} images/sec ' f'on {str(device)}')
 
-def main():
-
-    batch_size = 128
-    lr, num_epochs = 0.001, 10
-    
+def main(args):
     # The original VGG network has 5 convolutional blocks.
     # The first two blocks have one convolutional layer.
     # The latter three blocks contain two convolutional layers.
     conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
 
     # The parameters of VGG-11 are big, use a ratio to reduce the network size by dividing a ratio on the output channel number.
-    ratio = 4
+    ratio = args.ratio
     small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
     net = vgg(small_conv_arch)
 
-    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
 
     # load data
-    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size, resize=224)
+    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=224)
     # train
-    train(net, train_iter, test_iter, batch_size, optimizer, num_epochs)
+    train(net, train_iter, test_iter, batch_size, optimizer, args.num_epochs)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Image classification')
+    parser.add_argument('--batch_size', type=int, default=128, help='batch size')
+    parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
+    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
+    parser.add_argument('--ratio', type=float, default=4, help='ratio to reduce the network parameters size')
+    args = parser.parse_args()
+    main(args)
