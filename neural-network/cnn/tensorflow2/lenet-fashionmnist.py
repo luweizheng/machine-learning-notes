@@ -4,6 +4,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras
 import time
+sys.path.append("..") 
+import mlutils.tensorflow as mlutils
 
 def net():
     return tf.keras.models.Sequential([
@@ -26,6 +28,7 @@ def net():
         tf.keras.layers.Dense(84, activation='sigmoid'),
         tf.keras.layers.Dense(10)])
 
+# save to mlutils so that other program can use it
 def load_data_fashion_mnist(batch_size, resize=None):
     """Use keras datasets module to download the Fashion-MNIST dataset and then load it into memory."""
     
@@ -44,12 +47,14 @@ def load_data_fashion_mnist(batch_size, resize=None):
         tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
             batch_size).map(resize_fn))
 
+# save to mlutils so that other program can use it
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
     if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
         return tf.device(f'/GPU:{i}')
     return tf.device('/CPU:0')
 
+# save to mlutils so that other program can use it
 class Timer:
     """Timer class to record multiple running times."""
     def __init__(self):
@@ -108,21 +113,21 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
     device_name = device._device_name
     strategy = tf.distribute.OneDeviceStrategy(device_name)
     with strategy.scope():
-        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    callback = TrainCallback(net, train_iter, test_iter, num_epochs, device_name)
+    callback = mlutils.TrainCallback(net, train_iter, test_iter, num_epochs, device_name)
     history = net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
     return net
 
 def main():
 
     batch_size = 256
-    lr, num_epochs = 0.9, 100
+    lr, num_epochs = 0.001, 10
     
     # load data
-    train_iter, test_iter = load_data_fashion_mnist(batch_size=batch_size)
+    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=batch_size)
 
     # train
     train(net, train_iter, test_iter, num_epochs, lr)

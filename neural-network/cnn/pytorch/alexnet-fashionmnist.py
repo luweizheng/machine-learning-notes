@@ -4,7 +4,6 @@ import torch
 import torchvision
 from torch import nn, optim
 import sys
-import sys
 sys.path.append("..") 
 import mlutils.pytorch as mlutils
 

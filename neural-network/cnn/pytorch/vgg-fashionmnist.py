@@ -49,7 +49,7 @@ def vgg(conv_arch):
         nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
         nn.Linear(4096, 10))
 
-def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=try_gpu()):
+def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=mlutils.try_gpu()):
     net = net.to(device)
     print("training on", device)
     loss = torch.nn.CrossEntropyLoss()
