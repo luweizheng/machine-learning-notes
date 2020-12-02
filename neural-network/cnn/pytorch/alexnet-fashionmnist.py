@@ -12,8 +12,9 @@ class AlexNet(nn.Module):
     def __init__(self):
         super(AlexNet, self).__init__()
 
-        # conv: floor((input_shape - kernel_size + padding + stride) / stride)
+        # convolution layer will change input shape into: floor((input_shape - kernel_size + padding + stride) / stride)
         # input shape: 1 * 224 * 224
+        # convolution part
         self.conv = nn.Sequential(
             # conv layer 1
             # floor((224 - 11 + 2 + 4) / 4) = floor(54.75) = 54
@@ -41,7 +42,7 @@ class AlexNet(nn.Module):
             # 256 * 5 * 5
             nn.MaxPool2d(kernel_size=3, stride=2)
         )
-         # 
+        # fully connect part 
         self.fc = nn.Sequential(
             nn.Linear(256 * 5 * 5, 4096),
             nn.ReLU(),
