@@ -1,7 +1,11 @@
 import torch
+import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
-
+import argparse
+import sys
+sys.path.append("..") 
+import mlutils.pytorch as mlutils
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -114,16 +118,16 @@ def ResNet152():
     return ResNet(Bottleneck, [3, 8, 36, 3])
 
 def load_data_cifar10(batch_size, resize=None, root='~/Datasets/CIFAR10'):
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    transform_train = torchvision.transforms.Compose([
+        torchvision.transforms.RandomCrop(32, padding=4),
+        torchvision.transforms.RandomHorizontalFlip(),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
-    transform_test = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    transform_test = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
     cifar_train = torchvision.datasets.CIFAR10(
@@ -181,7 +185,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs, device=
 def main(args):
 
     net = ResNet18()
-    optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+    optimizer = torch.optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 
     # load data
     train_iter, test_iter = load_data_cifar10(batch_size=args.batch_size)
