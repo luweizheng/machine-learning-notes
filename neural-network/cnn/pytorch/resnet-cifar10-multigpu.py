@@ -131,9 +131,9 @@ def load_data_cifar10(batch_size, resize=None, root='~/Datasets/CIFAR10'):
     ])
 
     cifar_train = torchvision.datasets.CIFAR10(
-        root=root, train=True, download=True, transform=transform_train)
+        root=root, train=True, transform=transform_train)
     cifar_test = torchvision.datasets.CIFAR10(
-        root=root, train=False, download=True, transform=transform_test)
+        root=root, train=False, transform=transform_test)
 
     if sys.platform.startswith('win'):
         num_workers = 0
@@ -185,7 +185,7 @@ def train(net, train_iter, test_iter, batch_size, optimizer, num_epochs):
             print(f'epoch {epoch + 1} : loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
     # after training, calculate images/sec
     # variable `metric` is defined in for loop, but in Python it can be referenced after for loop
-    print(f'total training time {timer.sum():.2f}, {metric[2] * num_epochs / timer.sum():.1f} images/sec ' f'on {str(device)}')
+    print(f'total training time {timer.sum():.2f}')
 
 def main(args):
 

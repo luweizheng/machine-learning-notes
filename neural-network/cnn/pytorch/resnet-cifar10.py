@@ -131,9 +131,9 @@ def load_data_cifar10(batch_size, resize=None, root='~/Datasets/CIFAR10'):
     ])
 
     cifar_train = torchvision.datasets.CIFAR10(
-        root=root, train=True, download=True, transform=transform_train)
+        root=root, train=True, transform=transform_train)
     cifar_test = torchvision.datasets.CIFAR10(
-        root=root, train=False, download=True, transform=transform_test)
+        root=root, train=False, transform=transform_test)
 
     if sys.platform.startswith('win'):
         num_workers = 0
