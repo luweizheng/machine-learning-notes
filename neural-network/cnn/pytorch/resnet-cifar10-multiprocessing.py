@@ -242,7 +242,7 @@ def train(net, train_iter, test_iter, loss, epoch, optimizer, local_rank, args):
 
         torch.distributed.barrier()
 
-        reduced_loss = reduce_mean(loss, args.nprocs)
+        reduced_loss = reduce_mean(l, args.nprocs)
         losses.update(reduced_loss.item(), X.size(0))
 
         # compute gradient and do SGD step
@@ -286,11 +286,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CIFAR10 Distributed Training')
     parser.add_argument('--batch_size', type=int, default=1024, help='batch size')
     parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
-    parser.add_argument('--dist_url', type='str', default='tcp://127.0.0.1:20000')
+    parser.add_argument('--dist_url', type=str, default='tcp://127.0.0.1:20000')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
     parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='weight decay (default: 1e-4)')
-    parser.add_argument('--data', type='str', default='~/Datasets/CIFAR10', help='CIFAR10 dataset path')
+    parser.add_argument('--data', type=str, default='~/Datasets/CIFAR10', help='CIFAR10 dataset path')
     args = parser.parse_args()
     args.nprocs = torch.cuda.device_count()
     main(args)
