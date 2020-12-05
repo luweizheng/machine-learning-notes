@@ -231,6 +231,7 @@ def train(net, train_iter, test_iter, loss, epoch, optimizer, local_rank, args):
     # set the network in training mode
     net.train()
 
+    end = time.time()
     for X, y in train_iter:
         # move data to device (gpu)
         X = X.cuda(local_rank, non_blocking=True)
@@ -247,7 +248,7 @@ def train(net, train_iter, test_iter, loss, epoch, optimizer, local_rank, args):
 
         # compute gradient and do SGD step
         optimizer.zero_grad()
-        loss.backward()
+        l.backward()
         optimizer.step()
 
         # measure elapsed time
@@ -260,7 +261,7 @@ def validate(net, test_iter, loss, local_rank, args):
     total = 0
 
     # switch to evaluate mode
-    model.eval()
+    net.eval()
 
     with torch.no_grad():
         for i, (X, y) in enumerate(test_iter):

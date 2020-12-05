@@ -199,7 +199,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CIFAR10 Training')
-    parser.add_argument('--batch_size', type=int, default=128, help='batch size')
+    parser.add_argument('--batch_size', type=int, default=1024, help='batch size')
     parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
     args = parser.parse_args()
