@@ -13,19 +13,29 @@ def nin_block(in_channels, out_channels, kernel_size, strides, padding):
         nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())
 
 def nin():
+    '''
+    Returns the NiN network
+    '''
+    # input shape: 1 * 224 * 224
     net = nn.Sequential(
+        # 1 * 224 * 224 -> 96 * 54 * 54
         nin_block(1, 96, kernel_size=11, strides=4, padding=0),
-        nn.MaxPool2d(3, stride=2),
+        # 96 * 54 * 54 -> 96 * 26 * 26
+        nn.MaxPool2d(kernel_size=3, stride=2),
+        # 96 * 26 * 26 -> 256 * 26 * 26
         nin_block(96, 256, kernel_size=5, strides=1, padding=2),
+        # 256 * 26 * 26 -> 256 * 12 * 12
         nn.MaxPool2d(3, stride=2),
+        # 256 * 12 * 12 -> 384 * 12 * 12
         nin_block(256, 384, kernel_size=3, strides=1, padding=1),
+        # 384 * 12 * 12 -> 384 * 5 * 5
         nn.MaxPool2d(3, stride=2),
         nn.Dropout(0.5),
-        # There are 10 label classes
+        # 384 * 5 * 5 -> 10 * 5 * 5
         nin_block(384, 10, kernel_size=3, strides=1, padding=1),
+        # 10 * 5 * 5 -> 10 * 1 * 1
         nn.AdaptiveAvgPool2d((1, 1)),
-        # Transform the four-dimensional output into two-dimensional output with a
-        # shape of (batch size, 10)
+        # get the final classification result
         nn.Flatten())
 
     return net
