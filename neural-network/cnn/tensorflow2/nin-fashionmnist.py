@@ -50,7 +50,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr, device=mlutils.try_gpu(
     return net
 
 def main(args):
-    net = nin()
+    net = lambda: nin()
 
     # load data
     train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=224)
