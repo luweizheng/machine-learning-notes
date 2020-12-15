@@ -16,6 +16,7 @@ def nin():
     '''
     Returns the NiN network
     '''
+    # Fashion-MNIST 1 * 28 * 28, resize into the input into 1 * 224 * 224
     # input shape: 1 * 224 * 224
     net = nn.Sequential(
         # 1 * 224 * 224 -> 96 * 54 * 54
@@ -91,6 +92,5 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=128, help='batch size')
     parser.add_argument('--num_epochs', type=int, default=10, help='number of train epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
-    parser.add_argument('--ratio', type=float, default=4, help='ratio to reduce the network parameters size')
     args = parser.parse_args()
     main(args)
