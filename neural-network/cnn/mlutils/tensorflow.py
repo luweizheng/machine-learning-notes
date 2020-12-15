@@ -26,6 +26,20 @@ def try_gpu(i=0):
         return tf.device(f'/GPU:{i}')
     return tf.device('/CPU:0')
 
+def train(net_fn, train_iter, test_iter, num_epochs, lr, device=try_gpu()):
+    """Train a model with a GPU."""
+    device_name = device._device_name
+    print("training on", device_name)
+    strategy = tf.distribute.OneDeviceStrategy(device_name)
+    with strategy.scope():
+        optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    callback = TrainCallback(net, train_iter, test_iter, num_epochs, device_name)
+    history = net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
+    return net
+
 class Accumulator:
     """For accumulating sums over `n` variables."""
     def __init__(self, n):
