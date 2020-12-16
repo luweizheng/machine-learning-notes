@@ -9,7 +9,7 @@ import mlutils.pytorch as mlutils
 class InceptionBlock(nn.Module):
     # `c1`--`c4` are the number of output channels for each path
     def __init__(self, in_channels, c1, c2, c3, c4, **kwargs):
-        super(Inception, self).__init__(**kwargs)
+        super(InceptionBlock, self).__init__(**kwargs)
         # Path 1 is a single 1 x 1 convolutional layer
         self.p1_1 = nn.Conv2d(in_channels, c1, kernel_size=1)
         # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
