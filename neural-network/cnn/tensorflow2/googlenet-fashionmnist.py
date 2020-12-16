@@ -49,20 +49,20 @@ def googlenet():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 
     b3 = tf.keras.models.Sequential([
-        Inception(64, (96, 128), (16, 32), 32),
-        Inception(128, (128, 192), (32, 96), 64),
+        InceptionBlock(64, (96, 128), (16, 32), 32),
+        InceptionBlock(128, (128, 192), (32, 96), 64),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
     
     b4 = tf.keras.Sequential([
-        Inception(192, (96, 208), (16, 48), 64),
-        Inception(160, (112, 224), (24, 64), 64),
-        Inception(128, (128, 256), (24, 64), 64),
-        Inception(112, (144, 288), (32, 64), 64),
-        Inception(256, (160, 320), (32, 128), 128),
+        InceptionBlock(192, (96, 208), (16, 48), 64),
+        InceptionBlock(160, (112, 224), (24, 64), 64),
+        InceptionBlock(128, (128, 256), (24, 64), 64),
+        InceptionBlock(112, (144, 288), (32, 64), 64),
+        InceptionBlock(256, (160, 320), (32, 128), 128),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
     b5 = tf.keras.Sequential([
-        Inception(256, (160, 320), (32, 128), 128),
-        Inception(384, (192, 384), (48, 128), 128),
+        InceptionBlock(256, (160, 320), (32, 128), 128),
+        InceptionBlock(384, (192, 384), (48, 128), 128),
         tf.keras.layers.GlobalAvgPool2D(),
         tf.keras.layers.Flatten()
     ])
