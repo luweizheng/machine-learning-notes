@@ -67,14 +67,21 @@ def googlenet():
         tf.keras.layers.Flatten()
     ])
 
-    net = tf.keras.Sequential([b1, b2, b3, b4, b5,
+    net = tf.keras.Sequential()
+    net.add(b1)
+    net.add(b2)
+    net.add(b3)
+    net.add(b4)
+    net.add(b5)
+    net.add(tf.keras.layers.Dense(10))
+    #net = tf.keras.Sequential([b1, b2, b3, b4, b5,
                                 tf.keras.layers.Dense(10)])
     return net
 
 def main(args):
 
     # load data
-    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=224)
+    train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=96)
 
     # train
     mlutils.train(googlenet, train_iter, test_iter, args.num_epochs, args.lr)
