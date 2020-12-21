@@ -69,7 +69,7 @@ def main(args):
     train_iter, test_iter = mlutils.load_data_fashion_mnist(batch_size=args.batch_size, resize=96)
 
     # train
-    mlutils.train(googlenet, train_iter, test_iter, args.num_epochs, args.lr)
+    mlutils.train(resnet18, train_iter, test_iter, args.num_epochs, args.lr)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image classification')
