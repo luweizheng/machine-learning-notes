@@ -31,6 +31,7 @@ class InceptionBlock(nn.Module):
         p3 = F.relu(self.p3_2(F.relu(self.p3_1(x))))
         p4 = F.relu(self.p4_2(self.p4_1(x)))
         # Concatenate the outputs on the channel dimension
+        # the output channel number is c1 + c2[1] + c3[1] + c4
         return torch.cat((p1, p2, p3, p4), dim=1)
 
 def googlenet():
