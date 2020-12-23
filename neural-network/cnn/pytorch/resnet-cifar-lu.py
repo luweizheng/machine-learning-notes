@@ -1,6 +1,8 @@
 import torch
+import torchvision
 from torch import nn
 from torch.nn import functional as F
+import torchvision
 import argparse
 import sys
 sys.path.append("..") 
@@ -43,7 +45,7 @@ def resnet_block(in_channels, num_channels, num_residuals, first_block=False):
 def resnet18():
     """return resnet"""
     # convolutional and max pooling layer 
-    b1 = nn.Sequential(nn.Conv2d(in_channels=1, out_channels=64, kernel_size=7, stride=2, padding=3),
+    b1 = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3),
                    nn.BatchNorm2d(64), nn.ReLU(),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     # resnet block

@@ -1,5 +1,29 @@
 """
     FROM https://github.com/pytorch/examples/blob/master/imagenet/main.py
+
+    Single node, multiple GPUs:
+
+    ```bash
+    python main.py -a resnet18 --dist-url 'tcp://127.0.0.1:FREEPORT' --dist-backend 'nccl' --multiprocessing-distributed --world-size 1 --rank 0 [imagenet-folder with train and val folders]
+    ```
+
+    change FREEPORT to a PORT_NUMBER like 30000
+
+    Multiple nodes, multiple GPUs:
+
+    Node 0:
+
+    ```bash
+    python main.py -a resnet50 --dist-url 'tcp://IP_OF_NODE0:30000' --dist-backend 'nccl' --multiprocessing-distributed --world-size 2 --rank 0 [imagenet-folder with train and val folders]
+    ```
+
+    Node 1:
+
+    ```bash
+    python main.py -a resnet50 --dist-url 'tcp://IP_OF_NODE0:FREEPORT' --dist-backend 'nccl' --multiprocessing-distributed --world-size 2 --rank 1 [imagenet-folder with train and val folders]
+    ```
+
+    change IP_OF_NODE0 to a IP like 192.168.1.1
 """
 import argparse
 import os
