@@ -77,8 +77,9 @@ def main():
     writer = SummaryWriter(args.save_dir)
 
     model = resnet.__dict__[args.arch]()
-    images = torch.randn(128, 3, 32, 32)
-    writer.add_graph(model, images)
+    # visualize graph
+    # images = torch.randn(128, 3, 32, 32)
+    # writer.add_graph(model, images)
     # `torch.nn.DataParallel` will use all the GPUs in a single node by data parallelism 
     model = torch.nn.DataParallel(model)
     model.cuda()
