@@ -117,7 +117,7 @@ def main():
         num_workers=args.workers, pin_memory=True)
 
     images, labels = next(iter(train_loader))
-    writer.add_graph(model, images)
+    writer.add_graph(model.module, images.to("cuda:0"))
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
 
