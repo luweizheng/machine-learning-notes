@@ -34,7 +34,7 @@ parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--data', default="./CIFAR10", type=str,
                     help='PATH for CIFAR dataset')
-parser.add_argument('--epochs', default=200, type=int, metavar='N',
+parser.add_argument('--epochs', default=10, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
@@ -74,8 +74,9 @@ def main():
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
+    model = resnet.__dict__[args.arch]()
     # `torch.nn.DataParallel` will use all the GPUs in a single node by data parallelism 
-    model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
+    model = torch.nn.DataParallel(model)
     model.cuda()
 
     writer = SummaryWriter(args.save_dir)
@@ -117,7 +118,8 @@ def main():
         num_workers=args.workers, pin_memory=True)
 
     images, labels = next(iter(train_loader))
-    writer.add_graph(model.module, images.to("cuda:0"))
+    print("images shape: ", images.shape)
+    
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
 
