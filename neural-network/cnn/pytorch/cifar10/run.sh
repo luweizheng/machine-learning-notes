@@ -9,6 +9,7 @@ arch="resnet32"
 save_dir=${currentDir}"/"${arch}"/"${currtime}
 name="cifar10-"${arch}
 
+echo "save dir:"${save_dir}
 echo "running "${name}
 
 python -u train.py  --arch=${arch} \

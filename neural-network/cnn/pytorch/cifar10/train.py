@@ -73,13 +73,15 @@ def main():
     # Check the save_dir exists or not
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
+    
+    writer = SummaryWriter(args.save_dir)
 
     model = resnet.__dict__[args.arch]()
+    images = torch.randn(128, 3, 32, 32)
+    writer.add_graph(model, images)
     # `torch.nn.DataParallel` will use all the GPUs in a single node by data parallelism 
     model = torch.nn.DataParallel(model)
     model.cuda()
-
-    writer = SummaryWriter(args.save_dir)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -116,9 +118,6 @@ def main():
         ])),
         batch_size=128, shuffle=False,
         num_workers=args.workers, pin_memory=True)
-
-    images, labels = next(iter(train_loader))
-    print("images shape: ", images.shape)
     
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
