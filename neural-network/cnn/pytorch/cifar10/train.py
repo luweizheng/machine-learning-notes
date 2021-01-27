@@ -16,6 +16,7 @@ import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import resnet
+from torch.utils.tensorboard import SummaryWriter
 
 model_names = sorted(name for name in resnet.__dict__
     if name.islower() and not name.startswith("__")
@@ -73,8 +74,11 @@ def main():
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
+    # `torch.nn.DataParallel` will use all the GPUs in a single node by data parallelism 
     model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
     model.cuda()
+
+    writer = SummaryWriter(args.save_dir)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -112,9 +116,12 @@ def main():
         batch_size=128, shuffle=False,
         num_workers=args.workers, pin_memory=True)
 
+    images, labels = next(iter(train_loader))
+    writer.add_graph(model, images)
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
 
+    # use half precision (float16)
     if args.half:
         model.half()
         criterion.half()
@@ -146,6 +153,7 @@ def main():
 
         # evaluate on validation set
         prec1 = validate(val_loader, model, criterion)
+        writer.add_scalar('top1_acc/train', prec1, epoch)
 
         # remember best prec@1 and save checkpoint
         is_best = prec1 > best_prec1
@@ -162,6 +170,8 @@ def main():
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
         }, is_best, filename=os.path.join(args.save_dir, 'model.th'))
+
+    writer.close()
 
 
 def train(train_loader, model, criterion, optimizer, epoch):
