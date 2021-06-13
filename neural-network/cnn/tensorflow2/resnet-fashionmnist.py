@@ -7,7 +7,7 @@ import sys
 sys.path.append("..") 
 import mlutils.tensorflow as mlutils
 
-class Residual(tf.keras.Model):  #@save
+class Residual(tf.keras.Model): 
     """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
